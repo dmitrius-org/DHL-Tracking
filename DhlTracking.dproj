@@ -139,6 +139,7 @@
             <Form>ShippingMethod_F</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uVarUtils.pas"/>
         <RcItem Include="sql\SqlList.sql">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>

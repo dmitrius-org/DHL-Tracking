@@ -123,6 +123,8 @@ object Settings_F: TSettings_F
     Align = alTop
     Caption = 'Server Einstellungen'
     TabOrder = 3
+    ExplicitLeft = -8
+    ExplicitTop = 174
     DesignSize = (
       800
       190)
@@ -196,6 +198,18 @@ object Settings_F: TSettings_F
       Left = 32
       Top = 155
       Caption = 'DHL API Key:'
+    end
+    object edtIntervall: TcxCalcEdit
+      Left = 568
+      Top = 155
+      EditValue = 0.000000000000000000
+      TabOrder = 11
+      Width = 121
+    end
+    object cxLabel9: TcxLabel
+      Left = 483
+      Top = 155
+      Caption = 'Anrufintervall:'
     end
   end
   object cxGroupBox4: TcxGroupBox

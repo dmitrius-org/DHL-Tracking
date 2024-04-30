@@ -16,7 +16,8 @@ uses
   DataBaseU in 'dbStructure\DataBaseU.pas',
   UtilsTask in 'UtilsTask.pas',
   TaskLog_U in 'TaskLog_U.pas' {TaskLog_F},
-  ShippingMethod_U in 'ShippingMethod_U.pas' {ShippingMethod_F};
+  ShippingMethod_U in 'ShippingMethod_U.pas' {ShippingMethod_F},
+  uVarUtils in 'uVarUtils.pas';
 
 {$R *.res}
 

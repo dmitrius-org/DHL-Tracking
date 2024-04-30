@@ -18,6 +18,7 @@ begin
      Number         nvarchar(510) 
     ,Status         nvarchar(60) 
     ,InDate         DateTime default GetDate()
+    ,DateRefresh    datetime
     );
                     
     create unique index pk1 on tShipments(Number);
@@ -92,6 +93,7 @@ end
 go
 --SQL ShipmentsUpdate
 -- Обновление списока номеров по которым нужно получить данные
+
 insert [tShipments] (Number)
 SELECT distinct
        v.[cIdentCode]
@@ -99,14 +101,15 @@ SELECT distinct
  inner join tShippingMethod as sm (nolock) 
          on sm.id       = v.kVersandArt
         and sm.isActive = 1
- where isNumeric(cReference) <> 0
+ where isnull(cReference, '') <> ''
    and v.[dErstellt] >= convert(datetime, :BeginDate)
    and isnull(v.[cIdentCode], '') <> ''
    and not exists (select 1
                      from [tShipments] s with (nolock index=pk1)
                     where s.Number COLLATE Latin1_General_CI_AS = v.[cIdentCode])
 
-   -- order by v.[dErstellt] desc    
+   -- order by v.[dErstellt] desc
+
 go
 
 --SQL ShipmentInsert
@@ -145,11 +148,15 @@ select  p.Number
                      and t.Status = p.Status)
                                
    Update s
-      set s.Status = 'delivered'
+      set s.Status      = case
+                            when st.Status = 'delivered'
+                            then 'delivered'
+                            else s.Status
+                          end
+         ,s.DateRefresh = getdate()
      from pShipmentsTrack st (nolock)
     inner join tShipments s (updlock)
             on s.Number = st.Number
-           and isnull(s.Status, '') <> 'delivered'
-    where st.Status = 'delivered'
+
 go
 

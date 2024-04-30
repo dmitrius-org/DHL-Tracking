@@ -64,7 +64,7 @@ type
 
 implementation
 
-uses SqlListU, UtilsRegistry, dm, TaskLog_U, Settings_U, MainForm, MTLogger;
+uses SqlListU, UtilsRegistry, dm, TaskLog_U, Settings_U, MainForm, MTLogger, uVarUtils;
 
 function Start(AConnection: TFDConnection): boolean;
   var ThreadBegin:TTask;
@@ -119,7 +119,6 @@ end;
 
 function TTask.GetDHLData(ShipmentNumber: string): string;
 var client: THTTPClient;
- // headers: TNetHeaders;
   response: IHTTPResponse;
   JSonValue:TJSonValue;
   s: TJSonValue;
@@ -130,10 +129,13 @@ begin
   Result := '';
 
   URI:= TURI.Create('https://api-eu.dhl.com/track/shipments');
+
   URI.AddParameter('trackingNumber', ShipmentNumber);
   URI.AddParameter('language', 'DE');
+
   logger.Info(URI.ToString);
   client := THTTPClient.Create;
+
   try
     response := client.Get(URI.ToString, nil, [
        TNameValuePair.Create('Accept', 'application/json'),
@@ -159,6 +161,7 @@ begin
 
     Result := s.ToJSON;
 
+
   except
     on E: Exception do logger.Info(E.Message);
   end;
@@ -169,26 +172,35 @@ end;
 function TTask.ParseDhlShipments: boolean;
   var Query: TFDQuery;
       data: string;
+
+      Intervall : Integer;
 begin
   if FConnection.Connected then
   begin
 //    try
       try
+
         Query:= TFDQuery.Create(nil);
         Query.Connection :=FConnection;
-        Query.Open('select distinct s.number ' +
-                   '  from [tShipments] s with (nolock index=pk1) ' +
-                   ' inner join [eazybusiness].[dbo].[tVersand] as v with (nolock) ' +
-                   '         on v.[cIdentCode] = s.number COLLATE Latin1_General_CI_AS ' +
-                   ' inner join tShippingMethod as sm with (nolock) ' +
-                   '         on sm.id       = v.kVersandArt    ' +
-                   '        and sm.isActive = 1                ' +
-                   ' where isnull(s.status, '''') <> ''delivered''');
+        Query.Open('''
+                    select distinct s.number, isnull(s.DateRefresh, '19000101')
+                     from [tShipments] s with (nolock)
+                    inner join [eazybusiness].[dbo].[tVersand] as v with (nolock)
+                            on v.[cIdentCode] = s.number COLLATE Latin1_General_CI_AS
+                    inner join tShippingMethod as sm with (nolock)
+                            on sm.id       = v.kVersandArt
+                           and sm.isActive = 1
+                    where isnull(s.status, '') <> 'delivered'
+
+                    order by isnull(s.DateRefresh, '19000101')
+
+                   ''');
 
         Query.First;
         if Query.RecordCount > 0 then
         begin
-          while not Query.Eof do begin
+          while not Query.Eof do
+          begin
 
             logger.Info('StopParse: ' + isStopParse.ToString());
 
@@ -206,12 +218,16 @@ begin
             if data <> '' then
             begin
               ShipmentsInsert(data);
-//
-              Synchronize(TaskLogShowingRefresh);   //ShipmentInsert
+
+              Synchronize(TaskLogShowingRefresh);
             end;
 
             Query.Next;
-            Sleep(1000);
+
+            Intervall := VarToIntDef(regLoad('Intervall'), 6) * 1000;
+
+
+            Sleep(Intervall);
           end;
         end;
 
@@ -239,7 +255,10 @@ begin
   try
     QueryLog:= TFDQuery.Create(nil);
     QueryLog.Connection :=FConnection;
-    QueryLog.SQL.Text:='INSERT INTO tTaskLog ([MessageType], [MessageText]) VALUES (:MessageType, :MessageText)';
+    QueryLog.SQL.Text:='''
+                        INSERT INTO tTaskLog ([MessageType], [MessageText])
+                        VALUES (:MessageType, :MessageText)
+                       ''';
     QueryLog.ParamByName('MessageType').Value:=mType;
     QueryLog.ParamByName('MessageText').Value:=mText;
     QueryLog.ExecSQL();

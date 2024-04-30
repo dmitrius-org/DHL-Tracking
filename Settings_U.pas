@@ -10,7 +10,7 @@ uses
   cxSpinEdit, cxTimeEdit, cxMaskEdit, cxDropDownEdit, cxCalendar, cxLabel,
   Vcl.Menus, System.ImageList, Vcl.ImgList, cxImageList, Vcl.StdCtrls, cxButtons,
 
-  DateUtils ;
+  DateUtils, cxCalc ;
 
 type
   TSettings_F = class(TForm)
@@ -48,6 +48,8 @@ type
     edtDhlApiKey: TcxTextEdit;
     cxLabel8: TcxLabel;
     cbOnLog: TcxCheckBox;
+    edtIntervall: TcxCalcEdit;
+    cxLabel9: TcxLabel;
     procedure btnSaveClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btnTestConnectClick(Sender: TObject);
@@ -94,7 +96,7 @@ implementation
 {$R *.dfm}
 
 uses UtilsRegistry, ConnectionParamU, DataBaseU, UtilsTask, MTLogger,
-  ShippingMethod_U;
+  ShippingMethod_U, uVarUtils;
 
 
 
@@ -140,6 +142,9 @@ begin
 
   regSave('OnTray', cbOnTray.Checked);
   regSave('OnLog', cbOnLog.Checked);
+
+  regSave('Intervall', edtIntervall.Text);
+
 
   SetNextOnDate('NextOnDate1', edtTime1.Time);
   SetNextOnDate('NextOnDate2', edtTime2.Time);
@@ -264,6 +269,8 @@ begin
   edtUser.Text := regLoad('User');
   edtPas.Text := regLoad('Password');
   edtDhlApiKey.Text := regLoad('DhlApiKey');
+
+  edtIntervall.Value := VarToIntDef(regLoad('Intervall'), 6);
 
   cbOnTray.Checked := regLoad('OnTray')='True';
   cbOnLog.Checked := regLoad('OnLog')='True';
