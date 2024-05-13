@@ -1,4 +1,4 @@
-unit UtilsRegistry;
+п»їunit UtilsRegistry;
 
 interface
 
@@ -8,11 +8,11 @@ uses Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
 
 
     /// <summary>
-    /// RegSave - сохранение данных в реестр
+    /// RegSave - СЃРѕС…СЂР°РЅРµРЅРёРµ РґР°РЅРЅС‹С… РІ СЂРµРµСЃС‚СЂ
     ///</summary>
     Procedure RegSave(KeyName: string; Value: variant);
     /// <summary>
-    /// RegLoad - получение данны из реестра
+    /// RegLoad - РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹ РёР· СЂРµРµСЃС‚СЂР°
     ///</summary>
     function  RegLoad(KeyName: string): String;
 

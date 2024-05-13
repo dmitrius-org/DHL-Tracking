@@ -21,8 +21,6 @@ object ShippingMethod_F: TShippingMethod_F
     Height = 512
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 525
-    ExplicitHeight = 511
     object TableView: TcxGridDBTableView
       Navigator.Buttons.CustomButtons = <>
       ScrollbarAnnotations.CustomAnnotations = <>
@@ -71,7 +69,6 @@ object ShippingMethod_F: TShippingMethod_F
     Height = 41
     Align = alTop
     TabOrder = 1
-    ExplicitWidth = 525
     object btnShippingMethod: TcxButton
       Left = 12
       Top = 10

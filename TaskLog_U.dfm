@@ -19,8 +19,6 @@ object TaskLog_F: TTaskLog_F
     Height = 462
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 917
-    ExplicitHeight = 461
     object logGridDBTableView1: TcxGridDBTableView
       PopupMenu = PopupMenu
       Navigator.Buttons.CustomButtons = <>

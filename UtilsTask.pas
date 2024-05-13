@@ -1,4 +1,4 @@
-unit UtilsTask;
+п»їunit UtilsTask;
 
 interface
 
@@ -27,24 +27,24 @@ type
     property btnExecute: tControl read FbtnExecute write FbtnExecute;
 
     /// <summary>
-    ///  GetDHLData - получение данных с dhl по trackingNumber Ограничения скорости: ...
-    ///  позволяет совершать 250 вызовов в день с максимальной частотой 1 вызов в секунду .
+    ///  GetDHLData - РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… СЃ dhl РїРѕ trackingNumber РћРіСЂР°РЅРёС‡РµРЅРёСЏ СЃРєРѕСЂРѕСЃС‚Рё: ...
+    ///  РїРѕР·РІРѕР»СЏРµС‚ СЃРѕРІРµСЂС€Р°С‚СЊ 250 РІС‹Р·РѕРІРѕРІ РІ РґРµРЅСЊ СЃ РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ С‡Р°СЃС‚РѕС‚РѕР№ 1 РІС‹Р·РѕРІ РІ СЃРµРєСѓРЅРґСѓ .
     ///</summary>
     function GetDHLData(ShipmentNumber: string): string;
 
     /// <summary>
-    ///  ShipmentsUpdate - Обновление списока номеров по которым нужно получить данные
+    ///  ShipmentsUpdate - РћР±РЅРѕРІР»РµРЅРёРµ СЃРїРёСЃРѕРєР° РЅРѕРјРµСЂРѕРІ РїРѕ РєРѕС‚РѕСЂС‹Рј РЅСѓР¶РЅРѕ РїРѕР»СѓС‡РёС‚СЊ РґР°РЅРЅС‹Рµ
     ///</summary>
     procedure ShipmentsUpdate();
 
     /// <summary>
-    ///  ShipmentsInsert - добавление в базу данных по посылке
+    ///  ShipmentsInsert - РґРѕР±Р°РІР»РµРЅРёРµ РІ Р±Р°Р·Сѓ РґР°РЅРЅС‹С… РїРѕ РїРѕСЃС‹Р»РєРµ
     ///</summary>
     procedure ShipmentsInsert(AShipments: string);
 
     /// <summary>
-    ///  TaskLogInsert - Добавление информации/записи о выполнении задачи.
-    ///  Лог выполнения задачи
+    ///  TaskLogInsert - Р”РѕР±Р°РІР»РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё/Р·Р°РїРёСЃРё Рѕ РІС‹РїРѕР»РЅРµРЅРёРё Р·Р°РґР°С‡Рё.
+    ///  Р›РѕРі РІС‹РїРѕР»РЅРµРЅРёСЏ Р·Р°РґР°С‡Рё
     ///</summary>
     procedure TaskLogInsert(mType, mText: string);
 
@@ -70,12 +70,12 @@ function Start(AConnection: TFDConnection): boolean;
   var ThreadBegin:TTask;
 begin
   ThreadBegin:=TTask.Create(True);
-  ThreadBegin.FreeOnTerminate := true; // Экземпляр должен само уничтожиться после выполнения
-  ThreadBegin.Priority:=tThreadPriority.tpNormal; // Выставляем приоритет потока
+  ThreadBegin.FreeOnTerminate := true; // Р­РєР·РµРјРїР»СЏСЂ РґРѕР»Р¶РµРЅ СЃР°РјРѕ СѓРЅРёС‡С‚РѕР¶РёС‚СЊСЃСЏ РїРѕСЃР»Рµ РІС‹РїРѕР»РЅРµРЅРёСЏ
+  ThreadBegin.Priority:=tThreadPriority.tpNormal; // Р’С‹СЃС‚Р°РІР»СЏРµРј РїСЂРёРѕСЂРёС‚РµС‚ РїРѕС‚РѕРєР°
 
   ThreadBegin.Connection := AConnection;
 
-  ThreadBegin.Resume; // непосредственно ручной запуск потока
+  ThreadBegin.Resume; // РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕ СЂСѓС‡РЅРѕР№ Р·Р°РїСѓСЃРє РїРѕС‚РѕРєР°
 end;
 
 
@@ -126,6 +126,8 @@ var client: THTTPClient;
 
   StatusCode : string;
 begin
+  logger.Info('Exec GetDHLData');
+  logger.Info('ShipmentNumber: ' + ShipmentNumber);
   Result := '';
 
   URI:= TURI.Create('https://api-eu.dhl.com/track/shipments');
@@ -150,7 +152,7 @@ begin
       StatusCode :='Error';
     TaskLogInsert(StatusCode, ShipmentNumber + ' Status: ' + response.StatusCode.ToString + ' and reason: ' + response.StatusText);
 
-    if response.StatusCode = 429 then Terminate;  // превышен лимит запросов
+    if response.StatusCode = 429 then Terminate;  // РїСЂРµРІС‹С€РµРЅ Р»РёРјРёС‚ Р·Р°РїСЂРѕСЃРѕРІ
 
     if response.StatusCode = 200 then
     begin
@@ -177,7 +179,8 @@ function TTask.ParseDhlShipments: boolean;
 begin
   if FConnection.Connected then
   begin
-//    try
+    try
+      logger.Info('Exec ParseDhlShipments Begin');
       try
 
         Query:= TFDQuery.Create(nil);
@@ -206,7 +209,7 @@ begin
 
             if isStopParse then
             begin
-              TaskLogInsert('Stop', 'Parsing abbrechen');
+              TaskLogInsert('Stop', 'ParsingВ abbrechen');
               Terminate;
               Exit();
             end;
@@ -236,10 +239,19 @@ begin
         isStopParse := False;
         Synchronize(TaskLogButtonEnabled);
         Synchronize(TaskLogRefresh);
+
+        logger.Info('Exec ParseDhlShipments End');
       end;
-//    except
-//      // on Exception do ...
-//    end;
+
+    except
+       on E: Exception do
+       begin
+         logger.Info('Exec ParseDhlShipments Exception');
+         logger.Info(E.Message);
+         logger.Info('');
+         logger.Info('data: ' + data);
+       end;
+    end;
   end;
 end;
 
@@ -277,7 +289,8 @@ procedure TTask.ShipmentsInsert(AShipments: string);
 begin
   if FConnection.Connected then
   begin
-//    try
+      logger.Info('Exec ShipmentsInsert');
+      //logger.Info('AShipments: ' + AShipments);
       try
         Query:= TFDQuery.Create(nil);
         Query.Connection :=FConnection;
@@ -288,9 +301,6 @@ begin
       finally
         freeandnil(Query);
       end;
-//    except
-//      // on Exception do ...
-//    end;
   end;
 end;
 
@@ -299,23 +309,19 @@ procedure TTask.ShipmentsUpdate();
 begin
   if FConnection.Connected then
   begin
-//    try
+      logger.Info('Exec ShipmentsUpdate');
+      logger.Info('DateBegin: ' + regLoad('DateBegin'));
       try
         Query:= TFDQuery.Create(nil);
         Query.Connection :=FConnection;
         Query.SQL.Text:= SqlList['ShipmentsUpdate'];
         Query.ParamByName('BeginDate').Value:=regLoad('DateBegin');
         Query.Prepare;
-        //showmessage(regLoad('DateBegin'));
-        //showmessage(Query.SQL.Text);
         Query.ExecSQL;
 
       finally
         freeandnil(Query);
       end;
-//    except
-//      // on Exception do ...
-//    end;
   end;
 end;
 

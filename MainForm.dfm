@@ -553,8 +553,6 @@ object Form1: TForm1
     Align = alClient
     Images = cxImageList1
     TabOrder = 0
-    ExplicitWidth = 865
-    ExplicitHeight = 594
     object tsLog: TTabSheet
       Caption = 'DHL Track&Trace'
       ImageIndex = 1

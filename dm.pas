@@ -1,4 +1,4 @@
-unit dm;
+п»їunit dm;
 
 interface
 
@@ -46,7 +46,7 @@ procedure TDataModule1.DataModuleCreate(Sender: TObject);
 begin
   CreateDefLogger('DhlTracking.log');
   logger.isActive := (regLoad('OnLog') = 'True');
-  logger.Info('Программа запущена');
+  logger.Info('РџСЂРѕРіСЂР°РјРјР° Р·Р°РїСѓС‰РµРЅР°');
   TConn.ReadConnectionParam;
   TConn.Connection := FDConnection;
   if TConn.DbConnect() then
@@ -56,7 +56,7 @@ end;
 procedure TDataModule1.DataModuleDestroy(Sender: TObject);
 begin
 //  FDConnection.ExecSQL('delete from DatevTools100.dbo.pAmaExport where Spid = @@SPID');
-  logger.Info('Программа остановлена');
+  logger.Info('РџСЂРѕРіСЂР°РјРјР° РѕСЃС‚Р°РЅРѕРІР»РµРЅР°');
   FreeDefLogger;
 end;
 

@@ -1,4 +1,4 @@
-unit TaskLog_U;
+﻿unit TaskLog_U;
 
 interface
 

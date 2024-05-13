@@ -1,4 +1,4 @@
-unit MainForm;
+п»їunit MainForm;
 
 interface
 
@@ -34,8 +34,6 @@ type
 var
   Form1: TForm1;
 
-//  SettingForm: TSettings_F;
-//  TaskLogForm: TTaskLog_F;
 implementation
 
 {$R *.dfm}
@@ -61,10 +59,9 @@ end;
 
 procedure TForm1.TaskLogFormLoad;
 begin
-  // форма Лога выполнения задачи
+  // С„РѕСЂРјР° Р›РѕРіР° РІС‹РїРѕР»РЅРµРЅРёСЏ Р·Р°РґР°С‡Рё
   if Assigned(TaskLog_F) then
   begin
-//    TTaskLog_F := TTaskLog_F.Create(Self);
     TaskLog_F.BorderStyle := bsNone;
     TaskLog_F.Parent := tsLog;
     TaskLog_F.Align := alClient;
@@ -87,19 +84,8 @@ end;
 
 procedure TForm1.tsSettingsShow(Sender: TObject);
 begin
-  // форма настройки
-//  if not Assigned(SettingForm) then
-//  begin
-//    SettingForm := TSettings_F.Create(Self);
-//    SettingForm.BorderStyle := bsNone;
-//    SettingForm.Parent := tsSettings;
-//    SettingForm.Align := alClient;
-//    SettingForm.Show;
-//  end;
-
   if Assigned(Settings_F) then
   begin
-//    Settings_F := TSettings_F.Create(Self);
     Settings_F.BorderStyle := bsNone;
     Settings_F.Parent := tsSettings;
     Settings_F.Align := alClient;

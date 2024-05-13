@@ -1,4 +1,4 @@
-unit uVarUtils;
+﻿unit uVarUtils;
 
 interface
 
