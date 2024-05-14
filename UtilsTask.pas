@@ -289,8 +289,7 @@ procedure TTask.ShipmentsInsert(AShipments: string);
 begin
   if FConnection.Connected then
   begin
-      logger.Info('Exec ShipmentsInsert');
-      //logger.Info('AShipments: ' + AShipments);
+      logger.Info('Exec ShipmentsInsert Begin');
       try
         Query:= TFDQuery.Create(nil);
         Query.Connection :=FConnection;
@@ -300,6 +299,7 @@ begin
         Query.ExecSQL;
       finally
         freeandnil(Query);
+        logger.Info('Exec ShipmentsInsert End');
       end;
   end;
 end;
@@ -309,18 +309,32 @@ procedure TTask.ShipmentsUpdate();
 begin
   if FConnection.Connected then
   begin
-      logger.Info('Exec ShipmentsUpdate');
-      logger.Info('DateBegin: ' + regLoad('DateBegin'));
+
+    try
+      logger.Info('Exec ShipmentsUpdate Begin');
       try
         Query:= TFDQuery.Create(nil);
+        Query.Close;
         Query.Connection :=FConnection;
         Query.SQL.Text:= SqlList['ShipmentsUpdate'];
         Query.ParamByName('BeginDate').Value:=regLoad('DateBegin');
         Query.Prepare;
         Query.ExecSQL;
 
+      except
+         on E: Exception do
+         begin
+           logger.Info('Exec ShipmentsUpdate Exception');
+           logger.Info(E.Message);
+           logger.Info('');
+           logger.Info(Query.SQL.Text);
+           logger.Info('DateBegin: ' + regLoad('DateBegin'));
+         end;
+      end;
+
       finally
         freeandnil(Query);
+        logger.Info('Exec ShipmentsUpdate End');
       end;
   end;
 end;

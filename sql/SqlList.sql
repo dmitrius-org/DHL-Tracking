@@ -1,4 +1,4 @@
---SQL CreateDB
+п»ї--SQL CreateDB
 if db_id('TrackTraceDB') is null
   create database TrackTraceDB;
 go
@@ -7,10 +7,10 @@ use TrackTraceDB;
 go
 
 --SQL CreateDBSructure
---создание структуры базы данных TrackTraceDB
+--СЃРѕР·РґР°РЅРёРµ СЃС‚СЂСѓРєС‚СѓСЂС‹ Р±Р°Р·С‹ РґР°РЅРЅС‹С… TrackTraceDB
 use TrackTraceDB;
 
---tShipments - номера доставки                
+--tShipments - РЅРѕРјРµСЂР° РґРѕСЃС‚Р°РІРєРё                
 if OBJECT_ID('tShipments') is null  
 begin              
     create table tShipments 
@@ -26,13 +26,13 @@ begin
     grant all on tShipments to public; 
 end
 
--- tShipmentsTrack - статусы доставки
+-- tShipmentsTrack - СЃС‚Р°С‚СѓСЃС‹ РґРѕСЃС‚Р°РІРєРё
 if OBJECT_ID('tShipmentsTrack') is null
 begin
     create table tShipmentsTrack
     (
-     Number         nvarchar(510) 
-    ,Date           DateTime
+     Number         nvarchar(510)
+    ,Date           DateTime2
     ,Status         nvarchar(60) 
     ,Description    nvarchar(500) 
     ,InDate         DateTime default GetDate()
@@ -42,7 +42,7 @@ begin
     grant all on tShipmentsTrack to public;  
 end
 
--- tTaskLog - Таблица лога выполнения шедулера
+-- tTaskLog - РўР°Р±Р»РёС†Р° Р»РѕРіР° РІС‹РїРѕР»РЅРµРЅРёСЏ С€РµРґСѓР»РµСЂР°
 if OBJECT_ID('tTaskLog') is null
 begin
     create table tTaskLog
@@ -56,21 +56,20 @@ begin
     grant all on tTaskLog to public;                          
 end   
 
--- pShipmentsTrack - временная таблица статусы доставки
-if OBJECT_ID('pShipmentsTrack') is null
-begin
-    create table pShipmentsTrack
-    (
-     Number         nvarchar(510) 
-    ,Date           DateTime
-    ,Status         nvarchar(60) 
-    ,Description    nvarchar(500) 
-    );
-    create index ao1 on pShipmentsTrack(Number, Date, Status);
-    grant all on pShipmentsTrack to public;                          
-end  
+-- pShipmentsTrack - РІСЂРµРјРµРЅРЅР°СЏ С‚Р°Р±Р»РёС†Р° СЃС‚Р°С‚СѓСЃС‹ РґРѕСЃС‚Р°РІРєРё
+if OBJECT_ID('pShipmentsTrack') is not null
+  drop table pShipmentsTrack;
+create table pShipmentsTrack
+(
+ Number         nvarchar(510)
+,Date           DateTime2
+,Status         nvarchar(60)
+,Description    nvarchar(500)
+);
+create index ao1 on pShipmentsTrack(Number, Date, Status);
+grant all on pShipmentsTrack to public;
 
--- tShippingMethod - Способы доставки
+-- tShippingMethod - РЎРїРѕСЃРѕР±С‹ РґРѕСЃС‚Р°РІРєРё
 if OBJECT_ID('tShippingMethod') is null
 begin
     create table tShippingMethod
@@ -82,7 +81,7 @@ begin
     create index ao1 on tShippingMethod(Id);
     grant all on tShippingMethod to public;
     
-    -- добавление списка способов доставки
+    -- РґРѕР±Р°РІР»РµРЅРёРµ СЃРїРёСЃРєР° СЃРїРѕСЃРѕР±РѕРІ РґРѕСЃС‚Р°РІРєРё
     Insert tShippingMethod (Id, Name, isActive)
     select t.kVersandArt, t.cname, 0
       from [eazybusiness].[dbo].[tversandart] t (nolock)
@@ -92,7 +91,7 @@ end
 
 go
 --SQL ShipmentsUpdate
--- Обновление списока номеров по которым нужно получить данные
+-- РћР±РЅРѕРІР»РµРЅРёРµ СЃРїРёСЃРѕРєР° РЅРѕРјРµСЂРѕРІ РїРѕ РєРѕС‚РѕСЂС‹Рј РЅСѓР¶РЅРѕ РїРѕР»СѓС‡РёС‚СЊ РґР°РЅРЅС‹Рµ
 
 insert [tShipments] (Number)
 SELECT distinct
@@ -101,14 +100,12 @@ SELECT distinct
  inner join tShippingMethod as sm (nolock) 
          on sm.id       = v.kVersandArt
         and sm.isActive = 1
- where isnull(cReference, '') <> ''
+ where isnull(cReference, '')В <>В ''
    and v.[dErstellt] >= convert(datetime, :BeginDate)
    and isnull(v.[cIdentCode], '') <> ''
    and not exists (select 1
                      from [tShipments] s with (nolock index=pk1)
                     where s.Number COLLATE Latin1_General_CI_AS = v.[cIdentCode])
-
-   -- order by v.[dErstellt] desc
 
 go
 
@@ -155,8 +152,9 @@ select  p.Number
                           end
          ,s.DateRefresh = getdate()
      from pShipmentsTrack st (nolock)
-    inner join tShipments s (updlock)
+     left join tShipments s (updlock)
             on s.Number = st.Number
+    where st.Status = 'delivered'
 
 go
 
